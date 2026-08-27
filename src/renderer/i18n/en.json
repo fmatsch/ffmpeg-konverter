@@ -1,0 +1,132 @@
+{
+  "app": {
+    "title": "FFmpeg Converter",
+    "subtitle": "Convert video & audio, made simple"
+  },
+  "dropzone": {
+    "title": "Drop files here",
+    "subtitle": "or click to choose video and audio files",
+    "button": "Choose files"
+  },
+  "queue": {
+    "empty": "No files in the queue yet.",
+    "remove": "Remove",
+    "clearFinished": "Clear finished",
+    "cancel": "Cancel",
+    "open": "Open",
+    "showInFolder": "Show in folder",
+    "unknownDuration": "Unknown duration",
+    "eta": "{{time}} left",
+    "status": {
+      "pending": "Pending",
+      "probing": "Analyzing…",
+      "queued": "Queued",
+      "running": "Running…",
+      "done": "Done",
+      "error": "Error",
+      "canceled": "Canceled",
+      "skipped": "Skipped"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "mode": {
+      "video": "Video",
+      "audio": "Audio only"
+    },
+    "format": "Output format",
+    "videoCodec": "Video codec",
+    "audioCodec": "Audio codec",
+    "quality": "Quality",
+    "qualityMode": {
+      "crf": "Quality (CRF)",
+      "bitrate": "Fixed bitrate"
+    },
+    "crf": "CRF value (lower = better quality)",
+    "bitrate": "Video bitrate",
+    "resolution": "Resolution",
+    "keepAspectRatio": "Keep aspect ratio",
+    "scaleAlgorithm": "Scaling algorithm",
+    "upscaleHint": "Note: upscaling enlarges the image via interpolation (not AI-based enhancement).",
+    "framerate": "Frame rate",
+    "framerateOriginal": "Original",
+    "customWidth": "Width",
+    "customHeight": "Height",
+    "audio": "Audio",
+    "audioBitrate": "Audio bitrate",
+    "sampleRate": "Sample rate",
+    "sampleRateOriginal": "Original",
+    "channels": "Channels",
+    "channelsOriginal": "Original",
+    "channelsMono": "Mono",
+    "channelsStereo": "Stereo",
+    "mute": "Remove audio",
+    "losslessNote": "Lossless",
+    "applyToAll": "Apply to all files",
+    "perFileOverride": "Custom settings for this file"
+  },
+  "output": {
+    "title": "Output",
+    "mode": "Destination folder",
+    "sameAsSource": "Same folder as source",
+    "custom": "Custom folder",
+    "chooseFolder": "Choose folder",
+    "noFolderChosen": "No folder chosen",
+    "filenamePattern": "Filename pattern",
+    "filenamePatternHint": "{{name}} is replaced with the original name",
+    "onConflict": "If file already exists",
+    "onConflictRename": "Rename",
+    "onConflictOverwrite": "Overwrite",
+    "onConflictSkip": "Skip"
+  },
+  "presets": {
+    "title": "Quick presets",
+    "saveCurrent": "Save current settings",
+    "namePrompt": "Preset name",
+    "customTitle": "Custom presets",
+    "delete": "Delete"
+  },
+  "preset": {
+    "compatible": { "label": "Compatible", "description": "MP4 · H.264 · 720p – works everywhere" },
+    "smallest": { "label": "Smallest file", "description": "H.265, heavily compressed" },
+    "bestQuality": { "label": "Best quality", "description": "High quality, larger file" },
+    "audioOnly": { "label": "Audio only (MP3)", "description": "Extract the audio track as MP3" },
+    "losslessAudio": { "label": "Lossless audio", "description": "Extract the audio track as FLAC" },
+    "gif": { "label": "Create GIF", "description": "Short animation without sound" }
+  },
+  "format": {
+    "mp4": "MP4", "mkv": "MKV", "mov": "MOV", "webm": "WebM", "avi": "AVI", "flv": "FLV", "wmv": "WMV", "gif": "GIF",
+    "mp3": "MP3", "m4a": "M4A (AAC)", "wav": "WAV", "flac": "FLAC", "ogg": "OGG (Vorbis)", "opus": "Opus", "wma": "WMA"
+  },
+  "codec": {
+    "h264": "H.264 / AVC", "h265": "H.265 / HEVC", "vp9": "VP9", "av1": "AV1", "wmv2": "WMV",
+    "aac": "AAC", "mp3": "MP3", "opus": "Opus", "vorbis": "Vorbis", "flac": "FLAC", "pcm": "PCM (uncompressed)", "wma": "WMA",
+    "copy": "Keep original (no re-encoding)"
+  },
+  "resolution": {
+    "original": "Original", "480p": "480p", "720p": "720p (HD)", "1080p": "1080p (Full HD)",
+    "1440p": "1440p (QHD)", "2160p": "2160p (4K)", "4320p": "4320p (8K)", "custom": "Custom"
+  },
+  "scaleAlgo": {
+    "lanczos": "Lanczos (recommended, sharp)",
+    "bicubic": "Bicubic (smooth)",
+    "bilinear": "Bilinear (fast)",
+    "neighbor": "Nearest neighbor (blocky, very fast)"
+  },
+  "actions": {
+    "start": "Start conversion",
+    "starting": "Starting…",
+    "cancelAll": "Cancel all",
+    "addFiles": "Add files"
+  },
+  "footer": {
+    "filesCount_one": "{{count}} file",
+    "filesCount_other": "{{count}} files",
+    "concurrency": "Simultaneous conversions",
+    "language": "Language"
+  },
+  "errors": {
+    "probeFailed": "Could not read file.",
+    "genericTitle": "Error"
+  }
+}

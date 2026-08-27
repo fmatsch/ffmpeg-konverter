@@ -1,0 +1,132 @@
+{
+  "app": {
+    "title": "FFmpeg Konverter",
+    "subtitle": "Video & Audio einfach konvertieren"
+  },
+  "dropzone": {
+    "title": "Dateien hierher ziehen",
+    "subtitle": "oder klicken, um Video- und Audiodateien auszuwählen",
+    "button": "Dateien auswählen"
+  },
+  "queue": {
+    "empty": "Noch keine Dateien in der Warteschlange.",
+    "remove": "Entfernen",
+    "clearFinished": "Fertige entfernen",
+    "cancel": "Abbrechen",
+    "open": "Öffnen",
+    "showInFolder": "Im Ordner anzeigen",
+    "unknownDuration": "Dauer unbekannt",
+    "eta": "noch {{time}}",
+    "status": {
+      "pending": "Wartend",
+      "probing": "Analysiere…",
+      "queued": "In Warteschlange",
+      "running": "Läuft…",
+      "done": "Fertig",
+      "error": "Fehler",
+      "canceled": "Abgebrochen",
+      "skipped": "Übersprungen"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "mode": {
+      "video": "Video",
+      "audio": "Nur Audio"
+    },
+    "format": "Ausgabeformat",
+    "videoCodec": "Video-Codec",
+    "audioCodec": "Audio-Codec",
+    "quality": "Qualität",
+    "qualityMode": {
+      "crf": "Qualität (CRF)",
+      "bitrate": "Feste Bitrate"
+    },
+    "crf": "CRF-Wert (niedriger = bessere Qualität)",
+    "bitrate": "Video-Bitrate",
+    "resolution": "Auflösung",
+    "keepAspectRatio": "Seitenverhältnis beibehalten",
+    "scaleAlgorithm": "Skalierungsalgorithmus",
+    "upscaleHint": "Hinweis: Hochskalieren vergrößert das Bild durch Interpolation (keine KI-Bildverbesserung).",
+    "framerate": "Bildrate",
+    "framerateOriginal": "Original",
+    "customWidth": "Breite",
+    "customHeight": "Höhe",
+    "audio": "Audio",
+    "audioBitrate": "Audio-Bitrate",
+    "sampleRate": "Samplerate",
+    "sampleRateOriginal": "Original",
+    "channels": "Kanäle",
+    "channelsOriginal": "Original",
+    "channelsMono": "Mono",
+    "channelsStereo": "Stereo",
+    "mute": "Ton entfernen",
+    "losslessNote": "Verlustfrei",
+    "applyToAll": "Für alle Dateien übernehmen",
+    "perFileOverride": "Eigene Einstellungen für diese Datei"
+  },
+  "output": {
+    "title": "Ausgabe",
+    "mode": "Zielordner",
+    "sameAsSource": "Gleicher Ordner wie Quelldatei",
+    "custom": "Eigener Ordner",
+    "chooseFolder": "Ordner wählen",
+    "noFolderChosen": "Kein Ordner gewählt",
+    "filenamePattern": "Dateinamensmuster",
+    "filenamePatternHint": "{{name}} wird durch den Originalnamen ersetzt",
+    "onConflict": "Bei vorhandener Datei",
+    "onConflictRename": "Umbenennen",
+    "onConflictOverwrite": "Überschreiben",
+    "onConflictSkip": "Überspringen"
+  },
+  "presets": {
+    "title": "Schnellprofile",
+    "saveCurrent": "Aktuelle Einstellungen speichern",
+    "namePrompt": "Name für das Profil",
+    "customTitle": "Eigene Profile",
+    "delete": "Löschen"
+  },
+  "preset": {
+    "compatible": { "label": "Kompatibel", "description": "MP4 · H.264 · 720p – funktioniert überall" },
+    "smallest": { "label": "Kleinste Datei", "description": "H.265, stark komprimiert" },
+    "bestQuality": { "label": "Beste Qualität", "description": "Hohe Qualität, größere Datei" },
+    "audioOnly": { "label": "Nur Audio (MP3)", "description": "Audiospur als MP3 extrahieren" },
+    "losslessAudio": { "label": "Verlustfreies Audio", "description": "Audiospur als FLAC extrahieren" },
+    "gif": { "label": "GIF erstellen", "description": "Kurze Animation ohne Ton" }
+  },
+  "format": {
+    "mp4": "MP4", "mkv": "MKV", "mov": "MOV", "webm": "WebM", "avi": "AVI", "flv": "FLV", "wmv": "WMV", "gif": "GIF",
+    "mp3": "MP3", "m4a": "M4A (AAC)", "wav": "WAV", "flac": "FLAC", "ogg": "OGG (Vorbis)", "opus": "Opus", "wma": "WMA"
+  },
+  "codec": {
+    "h264": "H.264 / AVC", "h265": "H.265 / HEVC", "vp9": "VP9", "av1": "AV1", "wmv2": "WMV",
+    "aac": "AAC", "mp3": "MP3", "opus": "Opus", "vorbis": "Vorbis", "flac": "FLAC", "pcm": "PCM (unkomprimiert)", "wma": "WMA",
+    "copy": "Original beibehalten (kein Neukodieren)"
+  },
+  "resolution": {
+    "original": "Original", "480p": "480p", "720p": "720p (HD)", "1080p": "1080p (Full HD)",
+    "1440p": "1440p (QHD)", "2160p": "2160p (4K)", "4320p": "4320p (8K)", "custom": "Benutzerdefiniert"
+  },
+  "scaleAlgo": {
+    "lanczos": "Lanczos (empfohlen, scharf)",
+    "bicubic": "Bikubisch (weich)",
+    "bilinear": "Bilinear (schnell)",
+    "neighbor": "Nearest Neighbor (pixelig, sehr schnell)"
+  },
+  "actions": {
+    "start": "Konvertierung starten",
+    "starting": "Wird gestartet…",
+    "cancelAll": "Alle abbrechen",
+    "addFiles": "Dateien hinzufügen"
+  },
+  "footer": {
+    "filesCount_one": "{{count}} Datei",
+    "filesCount_other": "{{count}} Dateien",
+    "concurrency": "Gleichzeitige Konvertierungen",
+    "language": "Sprache"
+  },
+  "errors": {
+    "probeFailed": "Datei konnte nicht gelesen werden.",
+    "genericTitle": "Fehler"
+  }
+}
