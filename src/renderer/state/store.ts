@@ -16,7 +16,7 @@ function computeOutputPath(inputPath: string, settings: JobSettings, outputOptio
 }
 
 function createEmptyProgress(): Job['progress'] {
-  return { percent: 0, outTimeSec: 0, speed: null, etaSec: null, fps: null };
+  return { percent: 0, outTimeSec: 0, speed: null, etaSec: null, fps: null, phase: null };
 }
 
 interface ConverterState {
@@ -39,6 +39,8 @@ interface ConverterState {
   startAll: () => Promise<void>;
   cancelJob: (id: string) => void;
   cancelAll: () => void;
+  pauseJob: (id: string) => void;
+  resumeJob: (id: string) => void;
   applyJobUpdate: (payload: JobUpdatePayload) => void;
   setLanguage: (lang: AppSettings['language']) => void;
   setConcurrency: (n: number) => void;
@@ -157,7 +159,8 @@ export const useConverterStore = create<ConverterState>((set, get) => ({
           inputPath: j.inputPath,
           outputPath: j.outputPath,
           settings: j.settings,
-          durationSec: j.mediaInfo?.durationSec ?? 0
+          durationSec: j.mediaInfo?.durationSec ?? 0,
+          mediaInfo: j.mediaInfo
         })),
         concurrency: appSettings.concurrency,
         onConflict: outputOptions.onConflict
@@ -169,6 +172,14 @@ export const useConverterStore = create<ConverterState>((set, get) => ({
 
   cancelJob: (id) => {
     void window.api.cancelJob(id);
+  },
+
+  pauseJob: (id) => {
+    void window.api.pauseJob(id);
+  },
+
+  resumeJob: (id) => {
+    void window.api.resumeJob(id);
   },
 
   cancelAll: () => {

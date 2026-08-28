@@ -11,6 +11,8 @@ const api: ConverterApi = {
   startQueue: (request: StartQueueRequest): Promise<void> => ipcRenderer.invoke(IPC.startQueue, request),
   cancelJob: (id: string): Promise<void> => ipcRenderer.invoke(IPC.cancelJob, id),
   cancelAll: (): Promise<void> => ipcRenderer.invoke(IPC.cancelAll),
+  pauseJob: (id: string): Promise<void> => ipcRenderer.invoke(IPC.pauseJob, id),
+  resumeJob: (id: string): Promise<void> => ipcRenderer.invoke(IPC.resumeJob, id),
 
   onJobUpdate: (callback: (payload: JobUpdatePayload) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, payload: JobUpdatePayload) => callback(payload);

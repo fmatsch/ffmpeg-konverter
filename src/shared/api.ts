@@ -8,6 +8,8 @@ export interface ConverterApi {
   startQueue: (request: StartQueueRequest) => Promise<void>;
   cancelJob: (id: string) => Promise<void>;
   cancelAll: () => Promise<void>;
+  pauseJob: (id: string) => Promise<void>;
+  resumeJob: (id: string) => Promise<void>;
 
   onJobUpdate: (callback: (payload: JobUpdatePayload) => void) => () => void;
   onLanguageChanged: (callback: (lang: AppSettings['language']) => void) => () => void;

@@ -4,7 +4,12 @@ import { mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { getFfmpegPath } from './ffmpegBinary';
 import { buildFfmpegArgs } from './buildArgs';
-import type { JobSettings, JobUpdatePayload } from '@shared/types';
+import { resolveVideoCodecCandidates } from './hardwareEncoders';
+import { runAiUpscalePipeline } from './aiUpscale';
+import { suspendProcess, resumeProcess } from './processControl';
+import { getFormat, VIDEO_CODECS } from '@shared/formats';
+import { isAiUpscaleApplicable } from '@shared/aiUpscale';
+import type { JobSettings, JobUpdatePayload, MediaInfo } from '@shared/types';
 
 export interface QueueJobInput {
   id: string;
@@ -12,11 +17,13 @@ export interface QueueJobInput {
   outputPath: string;
   settings: JobSettings;
   durationSec: number;
+  mediaInfo: MediaInfo | null;
 }
 
 interface RunningJob {
-  process: ChildProcessWithoutNullStreams;
+  process: ChildProcessWithoutNullStreams | null;
   canceled: boolean;
+  paused: boolean;
 }
 
 function parseProgressChunk(chunk: string): Record<string, string> {
@@ -47,7 +54,7 @@ export class ConversionQueue extends EventEmitter {
     const job = this.running.get(id);
     if (job) {
       job.canceled = true;
-      job.process.kill();
+      job.process?.kill('SIGKILL');
       return;
     }
     const idx = this.pending.findIndex((j) => j.id === id);
@@ -59,11 +66,26 @@ export class ConversionQueue extends EventEmitter {
 
   cancelAll(): void {
     this.pending = [];
-    for (const [id, job] of this.running) {
+    for (const job of this.running.values()) {
       job.canceled = true;
-      job.process.kill();
-      void id;
+      job.process?.kill('SIGKILL');
     }
+  }
+
+  async pauseJob(id: string): Promise<void> {
+    const job = this.running.get(id);
+    if (!job || job.canceled) return;
+    job.paused = true;
+    if (job.process?.pid) await suspendProcess(job.process.pid);
+    this.emitUpdate({ id, status: 'paused' });
+  }
+
+  async resumeJob(id: string): Promise<void> {
+    const job = this.running.get(id);
+    if (!job || job.canceled) return;
+    job.paused = false;
+    if (job.process?.pid) await resumeProcess(job.process.pid);
+    this.emitUpdate({ id, status: 'running' });
   }
 
   private emitUpdate(payload: JobUpdatePayload): void {
@@ -73,7 +95,7 @@ export class ConversionQueue extends EventEmitter {
   private pump(): void {
     while (this.running.size < this.concurrency && this.pending.length > 0) {
       const job = this.pending.shift();
-      if (job) this.runJob(job);
+      if (job) void this.runJob(job);
     }
   }
 
@@ -87,49 +109,130 @@ export class ConversionQueue extends EventEmitter {
       return;
     }
 
-    const args = buildFfmpegArgs({ inputPath: job.inputPath, outputPath: job.outputPath, settings: job.settings });
-    const proc = spawn(getFfmpegPath(), args, { windowsHide: true });
-    const runningEntry: RunningJob = { process: proc, canceled: false };
+    const runningEntry: RunningJob = { process: null, canceled: false, paused: false };
     this.running.set(job.id, runningEntry);
 
-    let stderrTail = '';
-    let stdoutBuffer = '';
+    const registerProcess = (proc: ChildProcessWithoutNullStreams | null): void => {
+      runningEntry.process = proc;
+      // Falls während einer Pause die nächste Pipeline-Stufe (KI-Upscaling
+      // z. B.) startet, sofort wieder anhalten statt kurz weiterlaufen zu lassen.
+      if (proc?.pid && runningEntry.paused) void suspendProcess(proc.pid);
+    };
 
-    proc.stdout.on('data', (data: Buffer) => {
-      stdoutBuffer += data.toString('utf8');
-      const chunks = stdoutBuffer.split('progress=');
-      // Letztes (evtl. unvollständiges) Fragment für den nächsten Durchlauf aufheben.
-      stdoutBuffer = chunks.pop() ?? '';
-      for (const rawChunk of chunks) {
-        const fields = parseProgressChunk(rawChunk);
-        this.handleProgressFields(job, fields);
-      }
-    });
-
-    proc.stderr.on('data', (data: Buffer) => {
-      stderrTail += data.toString('utf8');
-      if (stderrTail.length > 4000) stderrTail = stderrTail.slice(-4000);
-    });
-
-    proc.on('error', (error) => {
-      this.emitUpdate({ id: job.id, status: 'error', error: error.message });
-    });
-
-    proc.on('close', (code) => {
-      this.running.delete(job.id);
-      if (runningEntry.canceled) {
-        this.emitUpdate({ id: job.id, status: 'canceled' });
-      } else if (code === 0) {
-        this.emitUpdate({
-          id: job.id,
-          status: 'done',
-          progress: { percent: 100 }
-        });
+    try {
+      const format = getFormat(job.settings.formatKey);
+      if (format.kind === 'video' && isAiUpscaleApplicable(job.settings, job.mediaInfo) && job.mediaInfo) {
+        const result = await runAiUpscalePipeline(
+          { inputPath: job.inputPath, outputPath: job.outputPath, settings: job.settings, durationSec: job.durationSec },
+          job.mediaInfo,
+          (progress) => {
+            this.emitUpdate({ id: job.id, progress: { percent: progress.percent, phase: progress.phase } });
+          },
+          { registerProcess, isCanceled: () => runningEntry.canceled }
+        );
+        this.running.delete(job.id);
+        this.emitUpdate(
+          result === 'canceled'
+            ? { id: job.id, status: 'canceled' }
+            : { id: job.id, status: 'done', progress: { percent: 100, phase: null } }
+        );
       } else {
-        const message = extractFfmpegError(stderrTail) ?? `FFmpeg wurde mit Code ${code} beendet.`;
-        this.emitUpdate({ id: job.id, status: 'error', error: message });
+        await this.runSinglePass(job, runningEntry);
       }
-      this.pump();
+    } catch (error) {
+      this.running.delete(job.id);
+      if (!runningEntry.canceled) {
+        this.emitUpdate({ id: job.id, status: 'error', error: (error as Error).message });
+      } else {
+        this.emitUpdate({ id: job.id, status: 'canceled' });
+      }
+    }
+
+    this.pump();
+  }
+
+  private async runSinglePass(job: QueueJobInput, runningEntry: RunningJob): Promise<void> {
+    const format = getFormat(job.settings.formatKey);
+    const candidates =
+      format.kind === 'video' && job.settings.videoCodec !== 'copy'
+        ? resolveVideoCodecCandidates(
+            VIDEO_CODECS[job.settings.videoCodec as keyof typeof VIDEO_CODECS].ffmpegCodec,
+            job.settings.videoCodec,
+            job.settings.hardwareAcceleration
+          )
+        : [undefined];
+
+    let lastError: string | null = null;
+    for (const codecChoice of candidates) {
+      if (runningEntry.canceled) return;
+      const args = buildFfmpegArgs({
+        inputPath: job.inputPath,
+        outputPath: job.outputPath,
+        settings: job.settings,
+        codecChoice
+      });
+
+      const outcome = await this.spawnAttempt(job, args, runningEntry);
+      if (outcome.status === 'success') {
+        this.running.delete(job.id);
+        this.emitUpdate({ id: job.id, status: 'done', progress: { percent: 100 } });
+        return;
+      }
+      if (outcome.status === 'canceled') {
+        this.running.delete(job.id);
+        this.emitUpdate({ id: job.id, status: 'canceled' });
+        return;
+      }
+      lastError = outcome.error;
+      // Bei Fehlschlag (z. B. Hardware-Encoder ohne passende GPU) mit dem
+      // nächsten Kandidaten weiterprobieren; der letzte Kandidat ist immer
+      // der Software-Encoder als garantierter Fallback.
+    }
+
+    this.running.delete(job.id);
+    this.emitUpdate({ id: job.id, status: 'error', error: lastError ?? 'Konvertierung fehlgeschlagen.' });
+  }
+
+  private spawnAttempt(
+    job: QueueJobInput,
+    args: string[],
+    runningEntry: RunningJob
+  ): Promise<{ status: 'success' } | { status: 'canceled' } | { status: 'failed'; error: string }> {
+    return new Promise((resolve) => {
+      const proc = spawn(getFfmpegPath(), args, { windowsHide: true });
+      runningEntry.process = proc;
+      if (runningEntry.paused && proc.pid) void suspendProcess(proc.pid);
+
+      let stderrTail = '';
+      let stdoutBuffer = '';
+
+      proc.stdout.on('data', (data: Buffer) => {
+        stdoutBuffer += data.toString('utf8');
+        const chunks = stdoutBuffer.split('progress=');
+        stdoutBuffer = chunks.pop() ?? '';
+        for (const rawChunk of chunks) {
+          this.handleProgressFields(job, parseProgressChunk(rawChunk));
+        }
+      });
+
+      proc.stderr.on('data', (data: Buffer) => {
+        stderrTail += data.toString('utf8');
+        if (stderrTail.length > 4000) stderrTail = stderrTail.slice(-4000);
+      });
+
+      proc.on('error', (error) => {
+        resolve({ status: 'failed', error: error.message });
+      });
+
+      proc.on('close', (code) => {
+        if (runningEntry.canceled) {
+          resolve({ status: 'canceled' });
+        } else if (code === 0) {
+          resolve({ status: 'success' });
+        } else {
+          resolve({ status: 'failed', error: extractFfmpegError(stderrTail) ?? `FFmpeg wurde mit Code ${code} beendet.` });
+        }
+      });
     });
   }
 

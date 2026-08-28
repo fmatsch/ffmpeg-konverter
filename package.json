@@ -7,13 +7,16 @@
   "license": "MIT",
   "main": "dist-electron/main/index.js",
   "scripts": {
+    "predev": "node scripts/fetch-realesrgan.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/fetch-realesrgan.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "build:mac": "npm run build && electron-builder --mac --publish never",
     "build:win": "npm run build && electron-builder --win --publish never",
     "build:all": "npm run build && electron-builder --mac --win --publish never",
     "gen:icons": "node scripts/generate-icons.mjs",
+    "fetch:ai-model": "node scripts/fetch-realesrgan.mjs",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {

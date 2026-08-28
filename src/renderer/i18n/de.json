@@ -13,6 +13,8 @@
     "remove": "Entfernen",
     "clearFinished": "Fertige entfernen",
     "cancel": "Abbrechen",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
     "open": "Öffnen",
     "showInFolder": "Im Ordner anzeigen",
     "unknownDuration": "Dauer unbekannt",
@@ -22,10 +24,18 @@
       "probing": "Analysiere…",
       "queued": "In Warteschlange",
       "running": "Läuft…",
+      "paused": "Pausiert",
       "done": "Fertig",
       "error": "Fehler",
       "canceled": "Abgebrochen",
       "skipped": "Übersprungen"
+    }
+  },
+  "ai": {
+    "phase": {
+      "extract": "Extrahiere Frames…",
+      "upscale": "KI-Upscaling läuft…",
+      "encode": "Video wird zusammengesetzt…"
     }
   },
   "settings": {
@@ -48,6 +58,11 @@
     "keepAspectRatio": "Seitenverhältnis beibehalten",
     "scaleAlgorithm": "Skalierungsalgorithmus",
     "upscaleHint": "Hinweis: Hochskalieren vergrößert das Bild durch Interpolation (keine KI-Bildverbesserung).",
+    "hardwareAcceleration": "Hardware-Beschleunigung nutzen (schneller)",
+    "hardwareAccelerationHint": "Nutzt die GPU (VideoToolbox/NVENC/QuickSync/AMF), sofern verfügbar; sonst automatischer Rückfall auf Software-Encoding. Dabei wird immer die Bitrate-Einstellung verwendet.",
+    "aiUpscale": "KI-Upscaling (Real-ESRGAN)",
+    "aiUpscaleHint": "Echtes neuronales Upscaling statt reiner Interpolation – deutlich bessere Details, aber viel langsamer. Wird nur angewendet, wenn die Zielauflösung größer als das Original ist.",
+    "aiUpscaleNotApplicable": "Wird für diese Datei nicht angewendet, da die Zielauflösung nicht größer als das Original ist.",
     "framerate": "Bildrate",
     "framerateOriginal": "Original",
     "customWidth": "Breite",

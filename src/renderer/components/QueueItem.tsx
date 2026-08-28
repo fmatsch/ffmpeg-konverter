@@ -6,7 +6,7 @@ import { useConverterStore } from '../state/store';
 import { formatDuration, formatSpeed } from '../utils/format';
 import { SettingsPanel } from './SettingsPanel';
 
-const ACTIVE_STATUSES: Job['status'][] = ['queued', 'running'];
+const ACTIVE_STATUSES: Job['status'][] = ['queued', 'running', 'paused'];
 const FINISHED_STATUSES: Job['status'][] = ['done', 'error', 'canceled', 'skipped'];
 
 function summarize(job: Job, t: (key: string) => string): string {
@@ -32,6 +32,8 @@ export function QueueItem({ job }: { job: Job }) {
   const [expanded, setExpanded] = useState(false);
   const removeJob = useConverterStore((s) => s.removeJob);
   const cancelJob = useConverterStore((s) => s.cancelJob);
+  const pauseJob = useConverterStore((s) => s.pauseJob);
+  const resumeJob = useConverterStore((s) => s.resumeJob);
   const updateJobSettings = useConverterStore((s) => s.updateJobSettings);
 
   const isActive = ACTIVE_STATUSES.includes(job.status);
@@ -55,11 +57,17 @@ export function QueueItem({ job }: { job: Job }) {
               <div className="progress-bar__fill" style={{ width: `${percent}%` }} />
             </div>
           )}
-          {job.status === 'running' && (
+          {(job.status === 'running' || job.status === 'paused') && (
             <div className="queue-item__stats">
               <span>{percent.toFixed(0)}%</span>
-              <span>{formatSpeed(job.progress.speed)}</span>
-              {job.progress.etaSec !== null && <span>{t('queue.eta', { time: formatDuration(job.progress.etaSec) })}</span>}
+              {job.progress.phase ? (
+                <span>{t(job.progress.phase)}</span>
+              ) : (
+                <>
+                  <span>{formatSpeed(job.progress.speed)}</span>
+                  {job.progress.etaSec !== null && <span>{t('queue.eta', { time: formatDuration(job.progress.etaSec) })}</span>}
+                </>
+              )}
             </div>
           )}
           {job.status === 'error' && job.error && <div className="queue-item__error">{job.error}</div>}
@@ -69,6 +77,16 @@ export function QueueItem({ job }: { job: Job }) {
           {!isFinished && (
             <button type="button" className="button button--ghost" onClick={() => setExpanded((v) => !v)}>
               ⚙
+            </button>
+          )}
+          {job.status === 'running' && (
+            <button type="button" className="button button--ghost" onClick={() => pauseJob(job.id)}>
+              {t('queue.pause')}
+            </button>
+          )}
+          {job.status === 'paused' && (
+            <button type="button" className="button button--ghost" onClick={() => resumeJob(job.id)}>
+              {t('queue.resume')}
             </button>
           )}
           {isActive && (

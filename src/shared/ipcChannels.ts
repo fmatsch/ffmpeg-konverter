@@ -5,6 +5,8 @@ export const IPC = {
   startQueue: 'queue:start',
   cancelJob: 'queue:cancelJob',
   cancelAll: 'queue:cancelAll',
+  pauseJob: 'queue:pauseJob',
+  resumeJob: 'queue:resumeJob',
   jobUpdate: 'queue:jobUpdate',
   getAppSettings: 'settings:get',
   setAppSettings: 'settings:set',

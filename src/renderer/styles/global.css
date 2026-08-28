@@ -284,6 +284,11 @@ body {
   color: var(--warning);
 }
 
+.status-badge--paused {
+  background: var(--bg-inset);
+  color: var(--text);
+}
+
 .queue-item__error {
   margin-top: 6px;
   font-size: 12px;

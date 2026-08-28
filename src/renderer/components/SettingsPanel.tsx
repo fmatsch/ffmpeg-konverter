@@ -10,6 +10,7 @@ import {
 } from '@shared/formats';
 import type { AudioCodecKey, VideoCodecKey } from '@shared/formats';
 import type { JobSettings, MediaInfo } from '@shared/types';
+import { isAiUpscaleApplicable } from '@shared/aiUpscale';
 
 const FRAMERATE_OPTIONS = [24, 25, 30, 50, 60];
 
@@ -73,6 +74,8 @@ export function SettingsPanel({ settings, onChange, mediaInfo, compact }: Settin
     settings.audio.codec !== 'copy' && settings.audio.codec !== 'none'
       ? AUDIO_CODECS[settings.audio.codec as keyof typeof AUDIO_CODECS]
       : null;
+  const supportsHardwareAccel = settings.videoCodec === 'h264' || settings.videoCodec === 'h265';
+  const aiUpscaleWontApply = settings.aiUpscale.enabled && mediaInfo ? !isAiUpscaleApplicable(settings, mediaInfo) : false;
 
   return (
     <div className={`settings-panel ${compact ? 'settings-panel--compact' : ''}`}>
@@ -113,6 +116,20 @@ export function SettingsPanel({ settings, onChange, mediaInfo, compact }: Settin
             )}
           </select>
         </div>
+      )}
+
+      {supportsHardwareAccel && (
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={settings.hardwareAcceleration}
+            onChange={(e) => onChange({ ...settings, hardwareAcceleration: e.target.checked })}
+          />
+          {t('settings.hardwareAcceleration')}
+        </label>
+      )}
+      {supportsHardwareAccel && settings.hardwareAcceleration && (
+        <p className="hint">{t('settings.hardwareAccelerationHint')}</p>
       )}
 
       {activeVideoCodecDef && (
@@ -230,6 +247,20 @@ export function SettingsPanel({ settings, onChange, mediaInfo, compact }: Settin
               {mediaInfo?.width && mediaInfo.height ? <p className="hint">{t('settings.upscaleHint')}</p> : null}
             </div>
           ) : null}
+
+          {!isImageFormat && (
+            <>
+              <label className="checkbox">
+                <input
+                  type="checkbox"
+                  checked={settings.aiUpscale.enabled}
+                  onChange={(e) => onChange({ ...settings, aiUpscale: { enabled: e.target.checked } })}
+                />
+                {t('settings.aiUpscale')}
+              </label>
+              <p className="hint">{aiUpscaleWontApply ? t('settings.aiUpscaleNotApplicable') : t('settings.aiUpscaleHint')}</p>
+            </>
+          )}
 
           <div className="field">
             <label>{t('settings.framerate')}</label>

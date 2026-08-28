@@ -13,6 +13,8 @@
     "remove": "Remove",
     "clearFinished": "Clear finished",
     "cancel": "Cancel",
+    "pause": "Pause",
+    "resume": "Resume",
     "open": "Open",
     "showInFolder": "Show in folder",
     "unknownDuration": "Unknown duration",
@@ -22,10 +24,18 @@
       "probing": "Analyzing…",
       "queued": "Queued",
       "running": "Running…",
+      "paused": "Paused",
       "done": "Done",
       "error": "Error",
       "canceled": "Canceled",
       "skipped": "Skipped"
+    }
+  },
+  "ai": {
+    "phase": {
+      "extract": "Extracting frames…",
+      "upscale": "AI upscaling…",
+      "encode": "Assembling video…"
     }
   },
   "settings": {
@@ -48,6 +58,11 @@
     "keepAspectRatio": "Keep aspect ratio",
     "scaleAlgorithm": "Scaling algorithm",
     "upscaleHint": "Note: upscaling enlarges the image via interpolation (not AI-based enhancement).",
+    "hardwareAcceleration": "Use hardware acceleration (faster)",
+    "hardwareAccelerationHint": "Uses the GPU (VideoToolbox/NVENC/QuickSync/AMF) if available, automatically falling back to software encoding otherwise. Always uses the bitrate setting.",
+    "aiUpscale": "AI upscaling (Real-ESRGAN)",
+    "aiUpscaleHint": "Real neural-network upscaling instead of plain interpolation — much better detail, but a lot slower. Only applied when the target resolution is larger than the original.",
+    "aiUpscaleNotApplicable": "Won't be applied to this file since the target resolution isn't larger than the original.",
     "framerate": "Frame rate",
     "framerateOriginal": "Original",
     "customWidth": "Width",

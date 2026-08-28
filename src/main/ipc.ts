@@ -97,6 +97,14 @@ export function registerIpcHandlers(getWindow: () => BrowserWindow | null): Conv
     queue.cancelAll();
   });
 
+  ipcMain.handle(IPC.pauseJob, async (_event, id: string) => {
+    await queue.pauseJob(id);
+  });
+
+  ipcMain.handle(IPC.resumeJob, async (_event, id: string) => {
+    await queue.resumeJob(id);
+  });
+
   ipcMain.handle(IPC.getAppSettings, async () => getAppSettings());
 
   ipcMain.handle(IPC.setAppSettings, async (_event, settings: AppSettings) => {

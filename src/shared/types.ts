@@ -27,6 +27,10 @@ export interface AudioSettings {
   mute: boolean;
 }
 
+export interface AiUpscaleSettings {
+  enabled: boolean;
+}
+
 export interface JobSettings {
   formatKey: string;
   videoCodec: VideoCodecKey;
@@ -34,6 +38,8 @@ export interface JobSettings {
   framerate: 'original' | number;
   resolution: ResolutionSettings;
   audio: AudioSettings;
+  hardwareAcceleration: boolean;
+  aiUpscale: AiUpscaleSettings;
 }
 
 export function createDefaultResolution(): ResolutionSettings {
@@ -64,7 +70,9 @@ export function createDefaultSettings(): JobSettings {
     quality: { mode: 'crf', crf: 23, bitrateKbps: 4000 },
     framerate: 'original',
     resolution: createDefaultResolution(),
-    audio: createDefaultAudio()
+    audio: createDefaultAudio(),
+    hardwareAcceleration: false,
+    aiUpscale: { enabled: false }
   };
 }
 
@@ -81,7 +89,16 @@ export interface MediaInfo {
   formatName: string | null;
 }
 
-export type JobStatus = 'pending' | 'probing' | 'queued' | 'running' | 'done' | 'error' | 'canceled' | 'skipped';
+export type JobStatus =
+  | 'pending'
+  | 'probing'
+  | 'queued'
+  | 'running'
+  | 'paused'
+  | 'done'
+  | 'error'
+  | 'canceled'
+  | 'skipped';
 
 export interface JobProgress {
   percent: number; // 0-100, -1 wenn unbekannt (z. B. Dauer nicht ermittelbar)
@@ -89,6 +106,7 @@ export interface JobProgress {
   speed: number | null; // z.B. 1.5x
   etaSec: number | null;
   fps: number | null;
+  phase: string | null; // z.B. "KI-Upscaling (42/150 Frames)" bei mehrstufigen Jobs
 }
 
 export interface Job {
@@ -134,6 +152,7 @@ export interface StartQueueRequest {
     outputPath: string;
     settings: JobSettings;
     durationSec: number;
+    mediaInfo: MediaInfo | null;
   }[];
   concurrency: number;
   onConflict: OutputOptions['onConflict'];
