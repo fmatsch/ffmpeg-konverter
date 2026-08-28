@@ -202,16 +202,18 @@
         return;
       }
 
-      const isAppleSilicon = /Mac/i.test(navigator.userAgent) && (navigator.maxTouchPoints > 1 || /Apple/i.test((navigator).gpu ?? ''));
-      const macAsset =
-        (isAppleSilicon && pickAsset(assets, (a) => a.name.endsWith('.dmg') && /arm64/i.test(a.name))) ||
-        pickAsset(assets, (a) => a.name.endsWith('.dmg') && !/arm64/i.test(a.name)) ||
-        pickAsset(assets, (a) => a.name.endsWith('.dmg'));
+      // Browser-JS kann Apple Silicon vs. Intel auf dem Mac nicht zuverlässig
+      // unterscheiden (macOS meldet aus Kompatibilitätsgründen immer "MacIntel").
+      // Da inzwischen die meisten aktiven Macs Apple Silicon sind, ist das der
+      // Standard-Download; ein expliziter Intel-Link steht daneben bereit.
+      const macAssetArm = pickAsset(assets, (a) => a.name.endsWith('.dmg') && /arm64/i.test(a.name));
+      const macAssetIntel = pickAsset(assets, (a) => a.name.endsWith('.dmg') && !/arm64/i.test(a.name));
+      const macAsset = macAssetArm || macAssetIntel;
       const winAsset = pickAsset(assets, (a) => a.name.endsWith('.exe'));
 
       const platform = detectPlatform();
       const primaryAsset = platform === 'win' ? winAsset : macAsset;
-      const primaryLabel = platform === 'win' ? 'Für Windows herunterladen' : 'Für macOS herunterladen';
+      const primaryLabel = platform === 'win' ? 'Für Windows herunterladen' : 'Für macOS herunterladen (Apple Silicon)';
 
       statusEl.remove();
 
@@ -227,6 +229,9 @@
       const secondaryLinks = [];
       if (platform !== 'win' && winAsset) {
         secondaryLinks.push(`<a href="${winAsset.browser_download_url}">Windows-Version herunterladen</a>`);
+      }
+      if (platform === 'mac' && macAssetIntel) {
+        secondaryLinks.push(`<a href="${macAssetIntel.browser_download_url}">Mac mit Intel-Prozessor herunterladen</a>`);
       }
       if (platform !== 'mac' && macAsset) {
         secondaryLinks.push(`<a href="${macAsset.browser_download_url}">macOS-Version herunterladen</a>`);
