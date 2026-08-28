@@ -4,9 +4,9 @@ Benutzerfreundlicher Video- und Audio-Konverter für Windows und macOS auf Basis
 
 ## Funktionen
 
-- Video-Formate: MP4, MKV, MOV, WebM, AVI, FLV, WMV, GIF
+- Video-Formate: MP4, MKV, MOV, WebM, AVI, FLV, WMV, MXF, GIF
 - Audio-Formate: MP3, M4A/AAC, WAV, FLAC, OGG, Opus, WMA
-- Codecs: H.264, H.265/HEVC, VP9, AV1 (Video); AAC, MP3, Opus, Vorbis, FLAC, PCM, WMA (Audio)
+- Codecs: H.264, H.265/HEVC, VP9, AV1, MPEG-2 (Video); AAC, MP3, Opus, Vorbis, FLAC, PCM, WMA (Audio)
 - Up- und Downscaling mit Presets (480p–8K) oder freier Auflösung, Seitenverhältnis wahlweise beibehalten
 - Qualität per CRF-Regler oder fester Bitrate, Framerate-Auswahl
 - Stapelverarbeitung (Batch) mit Fortschrittsanzeige, Geschwindigkeit/ETA, wählbarer Parallelität

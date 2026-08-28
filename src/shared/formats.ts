@@ -2,7 +2,7 @@
 // Wird sowohl vom Main-Prozess (Argument-Aufbau für FFmpeg) als auch vom
 // Renderer (Auswahlmöglichkeiten im UI) verwendet.
 
-export type VideoCodecKey = 'h264' | 'h265' | 'vp9' | 'av1' | 'wmv2' | 'copy';
+export type VideoCodecKey = 'h264' | 'h265' | 'vp9' | 'av1' | 'wmv2' | 'mpeg2' | 'copy';
 export type AudioCodecKey = 'aac' | 'mp3' | 'opus' | 'vorbis' | 'flac' | 'pcm' | 'wma' | 'copy' | 'none';
 
 export interface VideoCodecDef {
@@ -92,6 +92,14 @@ export const VIDEO_CODECS: Record<Exclude<VideoCodecKey, 'copy'>, VideoCodecDef>
     labelKey: 'codec.wmv2',
     supportsCrf: false,
     defaultBitrateKbps: 3000
+  },
+  mpeg2: {
+    key: 'mpeg2',
+    ffmpegCodec: 'mpeg2video',
+    labelKey: 'codec.mpeg2',
+    supportsCrf: false,
+    defaultBitrateKbps: 8000,
+    pixFmt: 'yuv420p'
   }
 };
 
@@ -237,6 +245,19 @@ export const VIDEO_FORMATS: OutputFormatDef[] = [
     videoCodecs: ['copy'],
     audioCodecs: ['none'],
     defaultAudioCodec: 'none'
+  },
+  {
+    key: 'mxf',
+    extension: 'mxf',
+    kind: 'video',
+    labelKey: 'format.mxf',
+    videoCodecs: ['h264', 'mpeg2', 'copy'],
+    defaultVideoCodec: 'mpeg2',
+    // Der MXF-Muxer verlangt unkomprimiertes PCM-Audio; Samplerate wird
+    // beim Encoden zusätzlich immer auf 48 kHz erzwungen (siehe buildArgs.ts).
+    audioCodecs: ['pcm', 'copy', 'none'],
+    defaultAudioCodec: 'pcm',
+    allowMuteAudio: true
   }
 ];
 

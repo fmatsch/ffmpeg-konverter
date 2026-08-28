@@ -28,7 +28,7 @@ function resolveOutputPath(
 }
 
 const MEDIA_EXTENSIONS = [
-  'mp4', 'mkv', 'mov', 'webm', 'avi', 'flv', 'wmv', 'm4v', 'ts', '3gp',
+  'mp4', 'mkv', 'mov', 'webm', 'avi', 'flv', 'wmv', 'mxf', 'm4v', 'ts', '3gp',
   'mp3', 'wav', 'flac', 'aac', 'm4a', 'ogg', 'opus', 'wma', 'aiff'
 ];
 

@@ -110,11 +110,11 @@
     "gif": { "label": "GIF erstellen", "description": "Kurze Animation ohne Ton" }
   },
   "format": {
-    "mp4": "MP4", "mkv": "MKV", "mov": "MOV", "webm": "WebM", "avi": "AVI", "flv": "FLV", "wmv": "WMV", "gif": "GIF",
+    "mp4": "MP4", "mkv": "MKV", "mov": "MOV", "webm": "WebM", "avi": "AVI", "flv": "FLV", "wmv": "WMV", "gif": "GIF", "mxf": "MXF",
     "mp3": "MP3", "m4a": "M4A (AAC)", "wav": "WAV", "flac": "FLAC", "ogg": "OGG (Vorbis)", "opus": "Opus", "wma": "WMA"
   },
   "codec": {
-    "h264": "H.264 / AVC", "h265": "H.265 / HEVC", "vp9": "VP9", "av1": "AV1", "wmv2": "WMV",
+    "h264": "H.264 / AVC", "h265": "H.265 / HEVC", "vp9": "VP9", "av1": "AV1", "wmv2": "WMV", "mpeg2": "MPEG-2",
     "aac": "AAC", "mp3": "MP3", "opus": "Opus", "vorbis": "Vorbis", "flac": "FLAC", "pcm": "PCM (unkomprimiert)", "wma": "WMA",
     "copy": "Original beibehalten (kein Neukodieren)"
   },

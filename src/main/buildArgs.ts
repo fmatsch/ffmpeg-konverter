@@ -65,7 +65,11 @@ export function buildAudioArgs(settings: JobSettings, format: ReturnType<typeof 
     if (!codecDef.lossless) {
       args.push('-b:a', `${settings.audio.bitrateKbps}k`);
     }
-    if (settings.audio.sampleRate !== 'original') {
+    if (format.key === 'mxf') {
+      // Der MXF-Muxer akzeptiert ausschließlich 48 kHz, unabhängig von der
+      // gewählten Samplerate-Einstellung.
+      args.push('-ar', '48000');
+    } else if (settings.audio.sampleRate !== 'original') {
       args.push('-ar', String(settings.audio.sampleRate));
     }
     if (settings.audio.channels !== 'original') {
