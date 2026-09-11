@@ -438,6 +438,21 @@ input[type='range'] {
   margin: 2px 0 0;
 }
 
+.hint--warning {
+  color: var(--warning);
+}
+
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .settings-panel--compact {
   padding-top: 4px;
 }

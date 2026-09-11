@@ -75,7 +75,16 @@ export function SettingsPanel({ settings, onChange, mediaInfo, compact }: Settin
       ? AUDIO_CODECS[settings.audio.codec as keyof typeof AUDIO_CODECS]
       : null;
   const supportsHardwareAccel = settings.videoCodec === 'h264' || settings.videoCodec === 'h265';
-  const aiUpscaleWontApply = settings.aiUpscale.enabled && mediaInfo ? !isAiUpscaleApplicable(settings, mediaInfo) : false;
+  // "Auflösung" oben ist zugleich die Zielauflösung fürs KI-Upscaling. Steht
+  // sie auf "Original", gibt es kein Ziel, auf das hochskaliert werden könnte.
+  const aiUpscaleTargetIsOriginal = settings.resolution.mode === 'preset' && settings.resolution.presetKey === 'original';
+  const aiUpscaleNotApplicableForFile =
+    settings.aiUpscale.enabled && !aiUpscaleTargetIsOriginal && mediaInfo ? !isAiUpscaleApplicable(settings, mediaInfo) : false;
+  const aiUpscaleNeedsResolution = settings.aiUpscale.enabled && aiUpscaleTargetIsOriginal;
+
+  function setResolutionPreset(presetKey: string) {
+    onChange({ ...settings, resolution: { ...settings.resolution, mode: 'preset', presetKey } });
+  }
 
   return (
     <div className={`settings-panel ${compact ? 'settings-panel--compact' : ''}`}>
@@ -258,7 +267,18 @@ export function SettingsPanel({ settings, onChange, mediaInfo, compact }: Settin
                 />
                 {t('settings.aiUpscale')}
               </label>
-              <p className="hint">{aiUpscaleWontApply ? t('settings.aiUpscaleNotApplicable') : t('settings.aiUpscaleHint')}</p>
+              {aiUpscaleNeedsResolution ? (
+                <p className="hint hint--warning">
+                  {t('settings.aiUpscaleNeedsResolution')}{' '}
+                  <button type="button" className="link-button" onClick={() => setResolutionPreset('1080p')}>
+                    {t('settings.aiUpscaleSetResolution')}
+                  </button>
+                </p>
+              ) : aiUpscaleNotApplicableForFile ? (
+                <p className="hint hint--warning">{t('settings.aiUpscaleNotApplicable')}</p>
+              ) : (
+                <p className="hint">{t('settings.aiUpscaleHint')}</p>
+              )}
             </>
           )}
 
