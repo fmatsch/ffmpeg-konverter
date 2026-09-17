@@ -24,7 +24,7 @@ export default defineConfig({
           build: {
             outDir: path.resolve(__dirname, 'dist-electron/main'),
             rollupOptions: {
-              external: ['electron', 'ffmpeg-static', 'ffprobe-static', 'electron-store']
+              external: ['electron', 'ffmpeg-static', '@ffprobe-installer/ffprobe', 'electron-store']
             }
           },
           resolve: {

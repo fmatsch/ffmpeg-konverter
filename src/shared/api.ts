@@ -4,6 +4,7 @@ export interface ConverterApi {
   selectInputFiles: () => Promise<string[]>;
   selectOutputDir: () => Promise<string | null>;
   probeFile: (path: string) => Promise<MediaInfo>;
+  getPathForFile: (file: File) => string;
 
   startQueue: (request: StartQueueRequest) => Promise<void>;
   cancelJob: (id: string) => Promise<void>;

@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, webUtils } from 'electron';
 import { IPC } from '@shared/ipcChannels';
 import type { AppSettings, JobUpdatePayload, MediaInfo, Preset, StartQueueRequest } from '@shared/types';
 import type { ConverterApi } from '@shared/api';
@@ -7,6 +7,10 @@ const api: ConverterApi = {
   selectInputFiles: (): Promise<string[]> => ipcRenderer.invoke(IPC.selectInputFiles),
   selectOutputDir: (): Promise<string | null> => ipcRenderer.invoke(IPC.selectOutputDir),
   probeFile: (path: string): Promise<MediaInfo> => ipcRenderer.invoke(IPC.probeFile, path),
+  // File.path wurde aus Sicherheitsgründen aus neueren Electron-Versionen
+  // entfernt; webUtils.getPathForFile ist der offizielle Ersatz, ist aber
+  // nur im Preload-Kontext verfügbar (daher hier gebridged).
+  getPathForFile: (file: File): string => webUtils.getPathForFile(file),
 
   startQueue: (request: StartQueueRequest): Promise<void> => ipcRenderer.invoke(IPC.startQueue, request),
   cancelJob: (id: string): Promise<void> => ipcRenderer.invoke(IPC.cancelJob, id),

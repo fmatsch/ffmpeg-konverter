@@ -3,7 +3,7 @@ declare module 'ffmpeg-static' {
   export default path;
 }
 
-declare module 'ffprobe-static' {
-  const ffprobe: { path: string };
+declare module '@ffprobe-installer/ffprobe' {
+  const ffprobe: { path: string; version: string; url: string };
   export default ffprobe;
 }

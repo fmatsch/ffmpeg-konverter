@@ -13,7 +13,7 @@ files:
 
 asarUnpack:
   - node_modules/ffmpeg-static/**
-  - node_modules/ffprobe-static/**
+  - node_modules/@ffprobe-installer/**
 
 extraResources:
   - from: vendor/realesrgan

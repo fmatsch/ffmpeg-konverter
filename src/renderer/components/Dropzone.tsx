@@ -17,8 +17,10 @@ export function Dropzone() {
     (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       setIsDragging(false);
+      // File.path wurde aus neueren Electron-Versionen entfernt; der Pfad
+      // muss über die Preload-Bridge (webUtils.getPathForFile) geholt werden.
       const paths = Array.from(e.dataTransfer.files)
-        .map((f) => (f as File & { path?: string }).path)
+        .map((f) => window.api.getPathForFile(f))
         .filter((p): p is string => Boolean(p));
       if (paths.length > 0) void addFiles(paths);
     },
