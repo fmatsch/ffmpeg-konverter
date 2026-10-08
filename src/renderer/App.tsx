@@ -7,6 +7,7 @@ import { Queue } from './components/Queue';
 import { PresetBar } from './components/PresetBar';
 import { SettingsPanel } from './components/SettingsPanel';
 import { OutputSettings } from './components/OutputSettings';
+import { WatchFolderPanel } from './components/WatchFolderPanel';
 
 export default function App() {
   const { t, i18n } = useTranslation();
@@ -16,6 +17,7 @@ export default function App() {
   const globalSettings = useConverterStore((s) => s.globalSettings);
   const setGlobalSettings = useConverterStore((s) => s.setGlobalSettings);
   const applyJobUpdate = useConverterStore((s) => s.applyJobUpdate);
+  const addWatchJob = useConverterStore((s) => s.addWatchJob);
   const setLanguage = useConverterStore((s) => s.setLanguage);
   const startAll = useConverterStore((s) => s.startAll);
   const cancelAll = useConverterStore((s) => s.cancelAll);
@@ -25,12 +27,14 @@ export default function App() {
   useEffect(() => {
     void init();
     const offUpdate = window.api.onJobUpdate(applyJobUpdate);
+    const offWatch = window.api.onWatchJobAdded(addWatchJob);
     const offLang = window.api.onLanguageChanged(setLanguage);
     return () => {
       offUpdate();
+      offWatch();
       offLang();
     };
-  }, [init, applyJobUpdate, setLanguage]);
+  }, [init, applyJobUpdate, addWatchJob, setLanguage]);
 
   useEffect(() => {
     void i18n.changeLanguage(appSettings.language);
@@ -56,6 +60,7 @@ export default function App() {
             <SettingsPanel settings={globalSettings} onChange={setGlobalSettings} />
           </div>
           <OutputSettings />
+          <WatchFolderPanel />
         </aside>
       </main>
       <footer className="app-footer">

@@ -15,5 +15,6 @@ export const IPC = {
   deletePreset: 'presets:delete',
   openPath: 'shell:openPath',
   showItemInFolder: 'shell:showItemInFolder',
-  languageChanged: 'app:languageChanged'
+  languageChanged: 'app:languageChanged',
+  watchJobAdded: 'watch:jobAdded'
 } as const;

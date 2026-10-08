@@ -529,3 +529,33 @@ input[type='range'] {
   display: flex;
   gap: 10px;
 }
+
+.hint--success {
+  color: var(--success);
+}
+
+.watch-panel__intro {
+  margin-bottom: 12px;
+}
+
+.watch-panel__output,
+.watch-panel .checkbox {
+  margin-top: 10px;
+}
+
+.watch-panel__target {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.watch-panel__target summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.watch-panel__copy {
+  margin-bottom: 12px;
+}

@@ -166,16 +166,40 @@ export interface JobUpdatePayload {
   mediaInfo?: MediaInfo;
 }
 
+export interface WatchSettings {
+  enabled: boolean;
+  folder: string | null;
+  outputMode: 'subfolder' | 'custom';
+  customOutputDir: string | null;
+  /** Bereits beim Aktivieren vorhandene Dateien ebenfalls konvertieren (sonst nur neu hinzukommende). */
+  processExisting: boolean;
+  /** Zielformat und alle Konvertierungseinstellungen für überwachte Dateien. */
+  settings: JobSettings;
+}
+
+export function createDefaultWatchSettings(): WatchSettings {
+  return {
+    enabled: false,
+    folder: null,
+    outputMode: 'subfolder',
+    customOutputDir: null,
+    processExisting: false,
+    settings: createDefaultSettings()
+  };
+}
+
 export interface AppSettings {
   language: 'de' | 'en';
   concurrency: number;
   output: OutputOptions;
+  watch: WatchSettings;
 }
 
 export function createDefaultAppSettings(): AppSettings {
   return {
     language: 'de',
     concurrency: 1,
-    output: createDefaultOutputOptions()
+    output: createDefaultOutputOptions(),
+    watch: createDefaultWatchSettings()
   };
 }

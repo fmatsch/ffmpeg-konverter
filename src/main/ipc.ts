@@ -1,39 +1,16 @@
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
-import { existsSync } from 'node:fs';
-import path from 'node:path';
 import { IPC } from '@shared/ipcChannels';
 import { probeFile } from './probe';
 import { ConversionQueue, type QueueJobInput } from './ffmpeg';
+import { resolveOutputPath } from './outputPath';
+import { FolderWatcher } from './watcher';
+import { MEDIA_EXTENSIONS } from '@shared/watch';
 import { getAppSettings, setAppSettings, getCustomPresets, saveCustomPreset, deleteCustomPreset } from './store';
 import type { AppSettings, JobUpdatePayload, Preset, StartQueueRequest } from '@shared/types';
 
-function resolveOutputPath(
-  desiredPath: string,
-  onConflict: StartQueueRequest['onConflict']
-): { path: string; skip: boolean } {
-  if (!existsSync(desiredPath)) return { path: desiredPath, skip: false };
-  if (onConflict === 'overwrite') return { path: desiredPath, skip: false };
-  if (onConflict === 'skip') return { path: desiredPath, skip: true };
-
-  const dir = path.dirname(desiredPath);
-  const ext = path.extname(desiredPath);
-  const base = path.basename(desiredPath, ext);
-  let n = 1;
-  let candidate = path.join(dir, `${base} (${n})${ext}`);
-  while (existsSync(candidate)) {
-    n += 1;
-    candidate = path.join(dir, `${base} (${n})${ext}`);
-  }
-  return { path: candidate, skip: false };
-}
-
-const MEDIA_EXTENSIONS = [
-  'mp4', 'mkv', 'mov', 'webm', 'avi', 'flv', 'wmv', 'mxf', 'm4v', 'ts', '3gp',
-  'mp3', 'wav', 'flac', 'aac', 'm4a', 'ogg', 'oga', 'opus', 'wma', 'aiff'
-];
-
-export function registerIpcHandlers(getWindow: () => BrowserWindow | null): ConversionQueue {
+export function registerIpcHandlers(getWindow: () => BrowserWindow | null): { queue: ConversionQueue; watcher: FolderWatcher } {
   const queue = new ConversionQueue();
+  const watcher = new FolderWatcher(queue, getWindow);
 
   queue.on('update', (payload: JobUpdatePayload) => {
     const win = getWindow();
@@ -108,7 +85,9 @@ export function registerIpcHandlers(getWindow: () => BrowserWindow | null): Conv
   ipcMain.handle(IPC.getAppSettings, async () => getAppSettings());
 
   ipcMain.handle(IPC.setAppSettings, async (_event, settings: AppSettings) => {
+    const previous = getAppSettings();
     setAppSettings(settings);
+    watcher.configure(settings.watch, previous.watch, settings.concurrency);
   });
 
   ipcMain.handle(IPC.getPresets, async () => getCustomPresets());
@@ -129,5 +108,5 @@ export function registerIpcHandlers(getWindow: () => BrowserWindow | null): Conv
     shell.showItemInFolder(filePath);
   });
 
-  return queue;
+  return { queue, watcher };
 }

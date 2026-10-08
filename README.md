@@ -12,6 +12,7 @@ Benutzerfreundlicher Video- und Audio-Konverter für Windows und macOS auf Basis
 - Stapelverarbeitung (Batch) mit Fortschrittsanzeige, Geschwindigkeit/ETA, wählbarer Parallelität
 - Schnellprofile (kompatibel, kleinste Datei, beste Qualität, nur Audio, verlustfreies Audio, GIF) + eigene Profile
 - Zielordner, Dateinamensmuster und Konfliktbehandlung frei konfigurierbar
+- Ordnerüberwachung: Neue Dateien in einem beobachteten Ordner werden automatisch ins voreingestellte Zielformat konvertiert (Ergebnisse standardmäßig im Unterordner „Konvertiert“; läuft, solange die App geöffnet ist – unter macOS auch bei geschlossenem Fenster)
 - Pause/Fortsetzen laufender Konvertierungen (echtes OS-Pausieren, macOS/Linux via SIGSTOP/SIGCONT, Windows via NtSuspendProcess)
 - Hardware-Beschleunigung (VideoToolbox/NVENC/QuickSync/AMF) für H.264/H.265 mit automatischem Software-Fallback, falls keine passende GPU verfügbar ist
 - Echtes KI-Upscaling (Real-ESRGAN, neuronales Netz) als Alternative zur klassischen Interpolation beim Hochskalieren
@@ -51,6 +52,7 @@ Windows-Codesigning-Zertifikat benötigt.
 
 - `src/main` – Electron-Hauptprozess (Fenster, FFmpeg-Warteschlange, IPC, Menü, Einstellungen)
 - `src/main/aiUpscale.ts` – KI-Upscaling-Pipeline (Frames extrahieren → Real-ESRGAN → Zielauflösung + Neukodierung)
+- `src/main/watcher.ts` – Ordnerüberwachung (Polling, wartet bis Dateien fertig kopiert sind, merkt sich bereits verarbeitete Dateien)
 - `src/main/hardwareEncoders.ts` – Kandidatenliste Hardware-/Software-Encoder mit automatischem Fallback
 - `src/main/processControl.ts` – plattformübergreifendes Pausieren/Fortsetzen von Prozessen
 - `src/preload` – abgesicherte `window.api`-Bridge (contextIsolation, kein nodeIntegration)

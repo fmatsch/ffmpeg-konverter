@@ -6,13 +6,15 @@ import { createDefaultAppSettings } from '@shared/types';
 interface StoreSchema {
   appSettings: AppSettings;
   customPresets: Preset[];
+  watchProcessed: string[];
 }
 
 const store = new Store<StoreSchema>({
   name: 'ffmpeg-konverter-config',
   defaults: {
     appSettings: createDefaultAppSettings(),
-    customPresets: []
+    customPresets: [],
+    watchProcessed: []
   }
 });
 
@@ -39,4 +41,14 @@ export function saveCustomPreset(preset: Omit<Preset, 'id' | 'builtIn'>): Preset
 export function deleteCustomPreset(id: string): void {
   const presets = getCustomPresets().filter((p) => p.id !== id);
   store.set('customPresets', presets);
+}
+
+const MAX_WATCH_PROCESSED = 5000;
+
+export function getWatchProcessed(): string[] {
+  return store.get('watchProcessed');
+}
+
+export function setWatchProcessed(keys: string[]): void {
+  store.set('watchProcessed', keys.slice(-MAX_WATCH_PROCESSED));
 }

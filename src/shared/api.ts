@@ -1,4 +1,4 @@
-import type { AppSettings, JobUpdatePayload, MediaInfo, Preset, StartQueueRequest } from './types';
+import type { AppSettings, Job, JobUpdatePayload, MediaInfo, Preset, StartQueueRequest } from './types';
 
 export interface ConverterApi {
   selectInputFiles: () => Promise<string[]>;
@@ -13,6 +13,7 @@ export interface ConverterApi {
   resumeJob: (id: string) => Promise<void>;
 
   onJobUpdate: (callback: (payload: JobUpdatePayload) => void) => () => void;
+  onWatchJobAdded: (callback: (job: Job) => void) => () => void;
   onLanguageChanged: (callback: (lang: AppSettings['language']) => void) => () => void;
 
   getAppSettings: () => Promise<AppSettings>;

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 import { IPC } from '@shared/ipcChannels';
-import type { AppSettings, JobUpdatePayload, MediaInfo, Preset, StartQueueRequest } from '@shared/types';
+import type { AppSettings, Job, JobUpdatePayload, MediaInfo, Preset, StartQueueRequest } from '@shared/types';
 import type { ConverterApi } from '@shared/api';
 
 const api: ConverterApi = {
@@ -22,6 +22,12 @@ const api: ConverterApi = {
     const listener = (_event: Electron.IpcRendererEvent, payload: JobUpdatePayload) => callback(payload);
     ipcRenderer.on(IPC.jobUpdate, listener);
     return () => ipcRenderer.removeListener(IPC.jobUpdate, listener);
+  },
+
+  onWatchJobAdded: (callback: (job: Job) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, job: Job) => callback(job);
+    ipcRenderer.on(IPC.watchJobAdded, listener);
+    return () => ipcRenderer.removeListener(IPC.watchJobAdded, listener);
   },
 
   onLanguageChanged: (callback: (lang: AppSettings['language']) => void): (() => void) => {

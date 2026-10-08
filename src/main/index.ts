@@ -69,9 +69,11 @@ function createWindow(): void {
 }
 
 if (gotLock) {
-  registerIpcHandlers(() => mainWindow);
+  const { watcher } = registerIpcHandlers(() => mainWindow);
 
   app.whenReady().then(() => {
+    const saved = getAppSettings();
+    watcher.configure(saved.watch, null, saved.concurrency);
     createWindow();
 
     app.on('activate', () => {

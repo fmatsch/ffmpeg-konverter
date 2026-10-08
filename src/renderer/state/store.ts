@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { getFormat } from '@shared/formats';
 import { createDefaultAppSettings, createDefaultOutputOptions, createDefaultSettings } from '@shared/types';
-import type { AppSettings, Job, JobSettings, JobUpdatePayload, OutputOptions, Preset } from '@shared/types';
+import type { AppSettings, Job, JobSettings, JobUpdatePayload, OutputOptions, Preset, WatchSettings } from '@shared/types';
 import { basenameOf, dirnameOf, joinPath, stemOf } from '../utils/paths';
 
 const FINISHED_STATUSES: Job['status'][] = ['done', 'error', 'canceled', 'skipped'];
@@ -42,6 +42,8 @@ interface ConverterState {
   pauseJob: (id: string) => void;
   resumeJob: (id: string) => void;
   applyJobUpdate: (payload: JobUpdatePayload) => void;
+  addWatchJob: (job: Job) => void;
+  setWatchSettings: (watch: WatchSettings) => void;
   setLanguage: (lang: AppSettings['language']) => void;
   setConcurrency: (n: number) => void;
   savePreset: (name: string) => Promise<void>;
@@ -200,6 +202,16 @@ export const useConverterStore = create<ConverterState>((set, get) => ({
           : j
       )
     })),
+
+  addWatchJob: (job) =>
+    set((state) => (state.jobs.some((j) => j.id === job.id) ? state : { jobs: [...state.jobs, job] })),
+
+  setWatchSettings: (watch) =>
+    set((state) => {
+      const appSettings = { ...state.appSettings, watch };
+      persistAppSettings(appSettings);
+      return { appSettings };
+    }),
 
   setLanguage: (lang) =>
     set((state) => {
