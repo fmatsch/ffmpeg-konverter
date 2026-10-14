@@ -120,6 +120,8 @@ export interface Job {
   progress: JobProgress;
   mediaInfo: MediaInfo | null;
   error: string | null;
+  /** true, sobald die Einstellungen dieser Datei einzeln angepasst wurden – dann folgt sie nicht mehr der globalen Vorlage. */
+  settingsCustomized?: boolean;
 }
 
 export interface OutputOptions {

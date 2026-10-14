@@ -1,7 +1,7 @@
 {
   "name": "ffmpeg-konverter",
   "productName": "FFmpeg Konverter",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Benutzerfreundlicher Video- und Audio-Konverter auf Basis von FFmpeg",
   "author": "fmatscheko",
   "license": "MIT",

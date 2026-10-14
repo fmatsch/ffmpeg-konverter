@@ -5,6 +5,8 @@ import type { AppSettings, Job, JobSettings, JobUpdatePayload, OutputOptions, Pr
 import { basenameOf, dirnameOf, joinPath, stemOf } from '../utils/paths';
 
 const FINISHED_STATUSES: Job['status'][] = ['done', 'error', 'canceled', 'skipped'];
+// Nur Dateien, die noch nicht gestartet wurden, übernehmen Änderungen an den globalen Einstellungen.
+const NOT_STARTED_STATUSES: Job['status'][] = ['pending', 'probing', 'error'];
 
 function computeOutputPath(inputPath: string, settings: JobSettings, outputOptions: OutputOptions): string {
   const format = getFormat(settings.formatKey);
@@ -115,17 +117,35 @@ export const useConverterStore = create<ConverterState>((set, get) => ({
   updateJobSettings: (id, settings) =>
     set((state) => ({
       jobs: state.jobs.map((j) =>
-        j.id === id ? { ...j, settings, outputPath: computeOutputPath(j.inputPath, settings, state.outputOptions) } : j
+        j.id === id
+          ? { ...j, settings, settingsCustomized: true, outputPath: computeOutputPath(j.inputPath, settings, state.outputOptions) }
+          : j
       )
     })),
 
-  setGlobalSettings: (settings) => set({ globalSettings: settings }),
+  // Änderungen im Einstellungs-Panel wirken sofort auf alle noch nicht gestarteten
+  // Dateien, die nicht einzeln angepasst wurden – sonst blieben bereits
+  // hinzugefügte Dateien unbemerkt bei den alten Einstellungen (z. B. Ausgangsauflösung).
+  setGlobalSettings: (settings) =>
+    set((state) => ({
+      globalSettings: settings,
+      jobs: state.jobs.map((j) =>
+        NOT_STARTED_STATUSES.includes(j.status) && !j.settingsCustomized
+          ? {
+              ...j,
+              settings: structuredClone(settings),
+              outputPath: computeOutputPath(j.inputPath, settings, state.outputOptions)
+            }
+          : j
+      )
+    })),
 
   applyGlobalToAll: () =>
     set((state) => ({
       jobs: state.jobs.map((j) => {
+        if (!NOT_STARTED_STATUSES.includes(j.status)) return j;
         const settings = structuredClone(state.globalSettings);
-        return { ...j, settings, outputPath: computeOutputPath(j.inputPath, settings, state.outputOptions) };
+        return { ...j, settings, settingsCustomized: false, outputPath: computeOutputPath(j.inputPath, settings, state.outputOptions) };
       })
     })),
 
