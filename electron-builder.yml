@@ -11,11 +11,11 @@ files:
   - dist-electron/**
   - package.json
 
-asarUnpack:
-  - node_modules/ffmpeg-static/**
-  - node_modules/@ffprobe-installer/**
+afterPack: scripts/after-pack.js
 
 extraResources:
+  - from: vendor/bin/${os}-${arch}
+    to: bin
   - from: vendor/realesrgan
     to: realesrgan
 

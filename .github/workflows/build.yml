@@ -32,6 +32,25 @@ jobs:
 
       - run: npm run ${{ matrix.script }}
 
+      - name: macOS-Pakete prüfen (Signatur und Architektur)
+        if: runner.os == 'macOS'
+        run: |
+          for pair in mac:x86_64 mac-arm64:arm64; do
+            APP="release/${pair%:*}/FFmpeg Konverter.app"
+            codesign --verify --deep --strict "$APP"
+            for bin in ffmpeg ffprobe; do
+              lipo -archs "$APP/Contents/Resources/bin/$bin" | grep -qx "${pair#*:}"
+            done
+          done
+
+      - name: Windows-Paket prüfen (FFmpeg enthalten und lauffähig)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          for bin in ffmpeg ffprobe; do
+            "release/win-unpacked/resources/bin/$bin.exe" -version
+          done
+
       - uses: actions/upload-artifact@v4
         with:
           name: ffmpeg-konverter-${{ matrix.os }}

@@ -43,9 +43,9 @@ Da hier nur ein Mac zur Verfügung steht, baut der Workflow unter `.github/workf
 bei jedem Tag-Push (`v*`) oder manuell über den "Run workflow"-Button automatisch sowohl die
 macOS- als auch die Windows-Version und stellt sie als Artefakte zum Download bereit.
 
-Hinweis: Die erzeugten Pakete sind nicht codesigniert. macOS zeigt beim ersten Start eine
-Gatekeeper-Warnung ("nicht verifizierter Entwickler"); über Rechtsklick → "Öffnen" lässt sich
-das bestätigen. Für eine signierte/notarisierte Verteilung wird eine Apple-Developer- bzw.
+Hinweis: Ohne Apple-Entwicklerzertifikat wird die macOS-App nur ad-hoc signiert
+(`scripts/after-pack.js`). Beim ersten Start die Meldung schließen und unter Systemeinstellungen →
+Datenschutz & Sicherheit „Dennoch öffnen“ wählen. Für eine signierte/notarisierte Verteilung wird eine Apple-Developer- bzw.
 Windows-Codesigning-Zertifikat benötigt.
 
 ## Architektur
