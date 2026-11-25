@@ -64,7 +64,10 @@ async function main() {
   const extractDir = path.join(VENDOR_DIR, '_extract');
   await mkdir(extractDir, { recursive: true });
   if (platform === 'win32') {
-    await execFileAsync('powershell', ['-NoProfile', '-Command', `Expand-Archive -Path '${zipPath}' -DestinationPath '${extractDir}' -Force`]);
+    // Das in Windows enthaltene bsdtar entpackt auch ZIP und meldet Fehler per
+    // Exit-Code (Expand-Archive scheiterte auf dem CI-Runner stillschweigend).
+    const tar = path.join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'tar.exe');
+    await execFileAsync(tar, ['-xf', zipPath, '-C', extractDir]);
   } else {
     await execFileAsync('unzip', ['-q', '-o', zipPath, '-d', extractDir]);
   }
@@ -74,6 +77,10 @@ async function main() {
   const sourceIsDir = existsSync(path.join(sourceRoot, binaryName));
 
   const flatRoot = sourceIsDir ? sourceRoot : extractDir;
+  if (!existsSync(path.join(flatRoot, binaryName))) {
+    const found = await readdir(extractDir, { recursive: true });
+    throw new Error(`${binaryName} fehlt nach dem Entpacken. Gefunden: ${found.join(', ') || '(nichts)'}`);
+  }
   await rename(path.join(flatRoot, binaryName), targetBinary);
   await mkdir(path.join(VENDOR_DIR, 'models'), { recursive: true });
   for (const modelFile of KEEP_MODEL_FILES) {
